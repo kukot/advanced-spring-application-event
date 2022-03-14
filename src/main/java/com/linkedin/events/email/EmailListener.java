@@ -1,8 +1,11 @@
 package com.linkedin.events.email;
 
+import com.linkedin.events.order.OrderEvents;
 import lombok.Data;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import static com.linkedin.events.customer.CustomerEvents.CustomerRegisteredEvent;
 import static com.linkedin.events.customer.CustomerEvents.CustomerRemovedEvent;
@@ -23,5 +26,10 @@ public class EmailListener {
     public void onCustomerRemoved(CustomerRemovedEvent event) {
         emailService.sendCustomerRemovedEmail(event.customer());
         System.out.println("Customer removed: " + event.customer().getId() + " has been removed with email: " + event.customer().getEmail());
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onOrderCompleted(OrderEvents.OrderCompletedEvent event) {
+        emailService.sendOrderEmail(event.order());
     }
 }

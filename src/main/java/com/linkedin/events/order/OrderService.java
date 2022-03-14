@@ -25,5 +25,7 @@ public class OrderService
         orderRepository.save(order);
 
         log.info("Publishing order completed event");
+        OrderEvents.OrderCompletedEvent event = new OrderEvents.OrderCompletedEvent(order);
+        publisher.publishEvent(event);
     }
 }
